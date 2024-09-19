@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include <sys/syscall.h>
 
-typedef struct individuo{
-  int :*;
+typedef struct {
+  int *cromossomo;
+  int *solution;
   int fitness;
-};
+} individuo; 
 
 int** lergrafo(char *nomearquivo, int *n, int *m){
   FILE *arquivo;
@@ -27,7 +30,21 @@ int** lergrafo(char *nomearquivo, int *n, int *m){
   return grafo;
 }
 
+individuo newIndividuo(int n){
+  individuo ind;
+  ind.cromossomo = (int*)malloc(n*sizeof(int));
+  for(int i = 0; i < n; i++){
+    ind.cromossomo[i] = rand();
+  }
+  return ind;
+}
+
+int generateSolution(individuo *ind){
+  
+}
+
 void main(){
+  srand(time(NULL));
   int n, m;
   int **grafo;
   grafo = lergrafo("grafo.txt", &n, &m);
@@ -36,7 +53,7 @@ void main(){
     return;
   }
   
-
+  
 
   for(int i = 0; i < n; i++){
     for(int j = 0; j < n; j++){
@@ -44,4 +61,14 @@ void main(){
     }
     printf("\n");
   }
+
+  individuo ind = newIndividuo(n);
+
+  for (int i = 0; i < n; i++){
+    printf("%d ", ind.cromossomo[i]);
+  }
+  
+
+  free(grafo);
+  free(ind.cromossomo);
 }
