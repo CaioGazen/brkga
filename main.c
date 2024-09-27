@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sys/syscall.h>
+#include <string.h>
 
 typedef struct {
   int *cromossomo;
@@ -39,9 +40,51 @@ individuo newIndividuo(int n){
   return ind;
 }
 
-int generateSolution(individuo *ind){
+void printArray(int *vet, int n){
+  for(int i = 0; i < n; i++){
+    printf("%d ", vet[i]);
+  }
+  printf("\n");
+
+}
+
+void selectionSort(int *vet, int *idx, int n){
+  int aux, min;
+  for(int i = 0; i < n; i++){
+    min = i;
+    for(int j = i+1; j < n; j++){
+      if(vet[j] < vet[min]){
+        min = j;
+      }
+    }
+    aux = vet[i];
+    vet[i] = vet[min];
+    vet[min] = aux;
+    
+    aux = idx[i];
+    idx[i] = idx[min];
+    idx[min] = aux;
+  }
+}
+
+int decoder(individuo *ind, int n){
+  int idx[n], copy[n];
+
+  for(int i = 0; i < n; i++){
+    idx[i] = i;
+  }
+  
+  memcpy(copy, ind->cromossomo, n*sizeof(int));
+
+  printArray(copy, n);
+  printArray(idx, n);
+  selectionSort(copy, idx, n);
+  printArray(copy, n);
+  printArray(idx, n);
   
 }
+
+
 
 void main(){
   srand(time(NULL));
@@ -64,10 +107,8 @@ void main(){
 
   individuo ind = newIndividuo(n);
 
-  for (int i = 0; i < n; i++){
-    printf("%d ", ind.cromossomo[i]);
-  }
-  
+
+  decoder(&ind, n);
 
   free(grafo);
   free(ind.cromossomo);
