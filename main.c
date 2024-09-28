@@ -48,6 +48,14 @@ void printArray(int *vet, int n){
 
 }
 
+void printSolution(int *vet, int n){
+  for(int i = 0; i < n; i++){
+    printf("%d ", vet[i] + 1);
+  }
+  printf("\n");
+
+}
+
 void selectionSort(int *vet, int *idx, int n){
   int aux, min;
   for(int i = 0; i < n; i++){
@@ -67,21 +75,31 @@ void selectionSort(int *vet, int *idx, int n){
   }
 }
 
-int decoder(individuo *ind, int n){
-  int idx[n], copy[n];
-
+int decoder(int **grafo, individuo ind, int n){
+  int idx[n+1], copy[n];
+  int fitness = 0;
   for(int i = 0; i < n; i++){
     idx[i] = i;
   }
   
-  memcpy(copy, ind->cromossomo, n*sizeof(int));
+  memcpy(copy, ind.cromossomo, n*sizeof(int));
 
   printArray(copy, n);
   printArray(idx, n);
   selectionSort(copy, idx, n);
   printArray(copy, n);
   printArray(idx, n);
+
+  idx[n] = idx[0];
   
+  printSolution(idx, n+1);
+
+  for(int i = 0; i < n; i++){
+    fitness += grafo[idx[i]][idx[i+1]];
+  }
+
+  ind.fitness = fitness;
+  printf("Fitness: %d\n", fitness);
 }
 
 
@@ -108,7 +126,7 @@ void main(){
   individuo ind = newIndividuo(n);
 
 
-  decoder(&ind, n);
+  decoder(grafo, ind, n);
 
   free(grafo);
   free(ind.cromossomo);
