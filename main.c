@@ -8,6 +8,7 @@ typedef struct {
   int *cromossomo;
   int *solution;
   int fitness;
+  int t;
 } individuo; 
 
 int** lergrafo(char *nomearquivo, int *n, int *m){
@@ -37,6 +38,8 @@ individuo newIndividuo(int n){
   for(int i = 0; i < n; i++){
     ind.cromossomo[i] = rand();
   }
+
+  ind.solution = (int*)malloc((n+1)*sizeof(int));
   return ind;
 }
 
@@ -98,11 +101,17 @@ int decoder(int **grafo, individuo ind, int n){
     fitness += grafo[idx[i]][idx[i+1]];
   }
 
+  
+  memcpy(ind.solution, idx, (n+1)*sizeof(int));
   ind.fitness = fitness;
   printf("Fitness: %d\n", fitness);
 }
 
-
+void preencherPopulacao(individuo *populacao, int n, int popIni, int popFim){
+  for(int i = popini; i < popFim; i++){
+    populacao[i] = newIndividuo(n);
+  }
+}
 
 void main(){
   srand(time(NULL));
@@ -114,8 +123,9 @@ void main(){
     return;
   }
   
+  int popSize = 10;
   
-
+  /*
   for(int i = 0; i < n; i++){
     for(int j = 0; j < n; j++){
       printf("%d ", grafo[i][j]);
@@ -128,6 +138,14 @@ void main(){
 
   decoder(grafo, ind, n);
 
+  printSolution(ind.solution, n+1);
+  */
+  individuo* populacao = malloc(popSize*sizeof(individuo));
+  
+  populacao[100].fitness = 1000;:
+  printf("%d\n", populacao[100].fitness);
+
+  
+
   free(grafo);
-  free(ind.cromossomo);
 }
