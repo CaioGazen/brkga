@@ -8,7 +8,6 @@ typedef struct {
   int *cromossomo;
   int *solution;
   int fitness;
-  int t;
 } individuo; 
 
 int** lergrafo(char *nomearquivo, int *n, int *m){
@@ -32,18 +31,17 @@ int** lergrafo(char *nomearquivo, int *n, int *m){
   return grafo;
 }
 
-individuo newIndividuo(int n){
-  individuo ind;
-  ind.cromossomo = (int*)malloc(n*sizeof(int));
+void allocIndividuo(individuo* ind, int n){
+  ind->cromossomo = malloc(n*sizeof(int));
   for(int i = 0; i < n; i++){
-    ind.cromossomo[i] = rand();
+    ind->cromossomo[i] = rand();
   }
 
-  ind.solution = (int*)malloc((n+1)*sizeof(int));
-  return ind;
+  ind->solution = malloc((n+1)*sizeof(int));
 }
 
 void printArray(int *vet, int n){
+  printf("Array: ");
   for(int i = 0; i < n; i++){
     printf("%d ", vet[i]);
   }
@@ -52,6 +50,7 @@ void printArray(int *vet, int n){
 }
 
 void printSolution(int *vet, int n){
+  printf("Solution :");
   for(int i = 0; i < n; i++){
     printf("%d ", vet[i] + 1);
   }
@@ -78,14 +77,14 @@ void selectionSort(int *vet, int *idx, int n){
   }
 }
 
-int decoder(int **grafo, individuo ind, int n){
+int decoder(int **grafo, individuo* ind, int n){
   int idx[n+1], copy[n];
   int fitness = 0;
   for(int i = 0; i < n; i++){
     idx[i] = i;
   }
-  
-  memcpy(copy, ind.cromossomo, n*sizeof(int));
+  printf("antes do memcpy\n");
+  memcpy(copy, ind->cromossomo, n*sizeof(int));
 
   printArray(copy, n);
   printArray(idx, n);
@@ -102,14 +101,25 @@ int decoder(int **grafo, individuo ind, int n){
   }
 
   
-  memcpy(ind.solution, idx, (n+1)*sizeof(int));
-  ind.fitness = fitness;
+  memcpy(ind->solution, idx, ((n)*sizeof(int)));
+
+  ind->fitness = fitness;
   printf("Fitness: %d\n", fitness);
 }
 
 void preencherPopulacao(individuo *populacao, int n, int popIni, int popFim){
-  for(int i = popini; i < popFim; i++){
-    populacao[i] = newIndividuo(n);
+  for(int i = popIni; i < popFim; i++){
+    allocIndividuo(&populacao[i], n);
+  }
+}
+
+
+void printPopulation(individuo *populacao, int n, int popSize){
+  for(int i = 0; i < popSize; i++){
+    printf("Individuo %d\n", i);
+    printArray(populacao[i].cromossomo, n);
+    printSolution(populacao[i].solution, n+1);
+    printf("Fitness: %d\n", populacao[i].fitness);
   }
 }
 
@@ -142,10 +152,23 @@ void main(){
   */
   individuo* populacao = malloc(popSize*sizeof(individuo));
   
-  populacao[100].fitness = 1000;:
-  printf("%d\n", populacao[100].fitness);
+  printf("Preenchendo populacao\n");
+  preencherPopulacao(populacao, n, 0, popSize);
 
+  printf("Populacao preenchida\n");
   
+  for (int i = 0; i < popSize; i++){
+    decoder(grafo, &populacao[i], n);
+  }
+  
+  printf("Populacao decodificada\n");
+
+  printf("imprimindo Populacao\n");
+  for(int i = 0; i < popSize; i++){
+    printf("%d\n", populacao[i].fitness);
+  }
+  printf("Populacao impressa\n");
+
 
   free(grafo);
 }
