@@ -123,6 +123,12 @@ void printPopulation(individuo *populacao, int n, int popSize){
   }
 }
 
+void calcularFitness(individuo *populacao, int **grafo, int n, int popSize){
+  for(int i = 0; i < popSize; i++){
+    decoder(grafo, &populacao[i], n);
+  }
+}
+
 void main(){
   srand(time(NULL));
   int n, m;
@@ -150,18 +156,19 @@ void main(){
 
   printSolution(ind.solution, n+1);
   */
-  individuo* populacao = malloc(popSize*sizeof(individuo));
+
+
+  individuo *populacao = malloc(popSize*sizeof(individuo));
   
   printf("Preenchendo populacao\n");
   preencherPopulacao(populacao, n, 0, popSize);
-
   printf("Populacao preenchida\n");
   
-  for (int i = 0; i < popSize; i++){
-    decoder(grafo, &populacao[i], n);
-  }
-  
+
+  calcularFitness(populacao, grafo, n, popSize);
   printf("Populacao decodificada\n");
+
+
 
   printf("imprimindo Populacao\n");
   for(int i = 0; i < popSize; i++){
