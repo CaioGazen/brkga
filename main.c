@@ -10,6 +10,7 @@ typedef struct {
   int fitness;
 } individuo; 
 
+
 int** lergrafo(char *nomearquivo, int *n, int *m){
   FILE *arquivo;
   int **grafo;
@@ -31,6 +32,7 @@ int** lergrafo(char *nomearquivo, int *n, int *m){
   return grafo;
 }
 
+
 void allocIndividuo(individuo* ind, int n){
   ind->cromossomo = malloc(n*sizeof(int));
   for(int i = 0; i < n; i++){
@@ -39,6 +41,7 @@ void allocIndividuo(individuo* ind, int n){
 
   ind->solution = malloc((n+1)*sizeof(int));
 }
+
 
 void printArray(int *vet, int n){
   printf("Array: ");
@@ -49,6 +52,7 @@ void printArray(int *vet, int n){
 
 }
 
+
 void printSolution(int *vet, int n){
   printf("Solution :");
   for(int i = 0; i < n; i++){
@@ -57,6 +61,7 @@ void printSolution(int *vet, int n){
   printf("\n");
 
 }
+
 
 void selectionSort(int *vet, int *idx, int n){
   int aux, min;
@@ -76,6 +81,42 @@ void selectionSort(int *vet, int *idx, int n){
     idx[min] = aux;
   }
 }
+
+
+int particiona(individuo *populacao, int ini, int fim){
+  int pivo = populacao[ini].fitness;
+  int i = ini;
+  individuo aux;
+
+  for(int j = ini+1; j <= fim; j++){
+    if(populacao[j].fitness <= pivo){
+
+      i++;
+
+      aux = populacao[i];
+      populacao[i] = populacao[j];
+      populacao[j] = aux;
+    }
+  }
+
+  aux = populacao[i];
+  populacao[i] = populacao[ini];
+  populacao[ini] = aux;
+
+  return i;
+}
+
+
+void quickSortPopulacao(individuo *populacao,  int ini, int fim){
+  int meio;
+
+  if (ini < fim){
+    meio = particiona(populacao, ini, fim);
+    quickSortPopulacao(populacao, ini, meio-1);
+    quickSortPopulacao(populacao, meio+1, fim);
+  }
+}
+
 
 int decoder(int **grafo, individuo* ind, int n){
   int idx[n+1], copy[n];
@@ -107,6 +148,7 @@ int decoder(int **grafo, individuo* ind, int n){
   printf("Fitness: %d\n", fitness);
 }
 
+
 void preencherPopulacao(individuo *populacao, int n, int popIni, int popFim){
   for(int i = popIni; i < popFim; i++){
     allocIndividuo(&populacao[i], n);
@@ -123,11 +165,13 @@ void printPopulation(individuo *populacao, int n, int popSize){
   }
 }
 
+
 void calcularFitness(individuo *populacao, int **grafo, int n, int popSize){
   for(int i = 0; i < popSize; i++){
     decoder(grafo, &populacao[i], n);
   }
 }
+
 
 void main(){
   srand(time(NULL));
@@ -176,6 +220,13 @@ void main(){
   }
   printf("Populacao impressa\n");
 
+  quickSortPopulacao(populacao, 0, popSize-1);
+
+  printf("imprimindo Populacao\n");
+  for(int i = 0; i < popSize; i++){
+    printf("%d\n", populacao[i].fitness);
+  }
+  printf("Populacao impressa\n");
 
   free(grafo);
 }
