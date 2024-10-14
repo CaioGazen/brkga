@@ -118,7 +118,6 @@ int decoder(int **grafo, individuo* ind, int n){
   for(int i = 0; i < n; i++){
     idx[i] = i;
   }
-  printf("antes do memcpy\n");
   memcpy(copy, ind->cromossomo, ((n)*sizeof(int)));
 
   selectionSort(copy, idx, n);
@@ -202,32 +201,32 @@ void main(){
   int eliteSize = 2;
   int mutanteSize = 2;
   int bias = 80;
-  int geracoes = 10000;
+  int geracoes = 100000;
 
 
   individuo *populacao = malloc(popSize*sizeof(individuo));
   individuo *nextPopulacao = malloc(popSize*sizeof(individuo));
   
-  printf("Preenchendo populacao\n");
+  printf("Preenchendo populacao inicial\n");
   preencherPopulacao(populacao, n, 0, popSize);
   
 
   for(int i = 0; i < geracoes; i++){
-    printf("Calculando Fitness\n");
+    //printf("Calculando Fitness\n");
     calcularFitness(populacao, grafo, n, popSize);
     
-    printf("Ordenando Populacao\n");
+    //printf("Ordenando Populacao\n");
     quickSortPopulacao(populacao, 0, popSize-1);
 
-    printPopulation(populacao, n, popSize);
+    //printPopulation(populacao, n, popSize);
 
-    printf("copiando elite\n");
+    //printf("copiando elite\n");
     copiarElite(populacao, nextPopulacao, eliteSize);
 
-    printf("gerando mutantes\n");
+    //printf("gerando mutantes\n");
     preencherPopulacao(nextPopulacao, n, popSize - mutanteSize, popSize);
 
-    printf("crossover\n");
+    //printf("crossover\n");
     crossover(populacao, n, nextPopulacao, popSize, eliteSize, mutanteSize, bias);
 
     populacao = nextPopulacao;
@@ -241,6 +240,9 @@ void main(){
   quickSortPopulacao(populacao, 0, popSize-1);
 
 
+
+
+  printPopulation(populacao, n, popSize);
   printf("imprimindo Populacao\n");
   for(int i = 0; i < popSize; i++){
     //printArray(populacao[i].cromossomo, n);
