@@ -35,10 +35,6 @@ int** lergrafo(char *nomearquivo, int *n, int *m){
 
 void allocIndividuo(individuo* ind, int n){
   ind->cromossomo = malloc(n*sizeof(int));
-  for(int i = 0; i < n; i++){
-    ind->cromossomo[i] = rand();
-  }
-
   ind->solution = malloc((n+1)*sizeof(int));
 }
 
@@ -49,7 +45,6 @@ void printArray(int *vet, int n){
     printf("%d ", vet[i]);
   }
   printf("\n");
-
 }
 
 
@@ -59,7 +54,6 @@ void printSolution(int *vet, int n){
     printf("%d ", vet[i] + 1);
   }
   printf("\n");
-
 }
 
 
@@ -127,31 +121,26 @@ int decoder(int **grafo, individuo* ind, int n){
   printf("antes do memcpy\n");
   memcpy(copy, ind->cromossomo, n*sizeof(int));
 
-  printArray(copy, n);
-  printArray(idx, n);
   selectionSort(copy, idx, n);
-  printArray(copy, n);
-  printArray(idx, n);
 
   idx[n] = idx[0];
-  
-  printSolution(idx, n+1);
 
   for(int i = 0; i < n; i++){
     fitness += grafo[idx[i]][idx[i+1]];
   }
 
-  
   memcpy(ind->solution, idx, ((n)*sizeof(int)));
 
   ind->fitness = fitness;
-  printf("Fitness: %d\n", fitness);
 }
 
 
 void preencherPopulacao(individuo *populacao, int n, int popIni, int popFim){
   for(int i = popIni; i < popFim; i++){
     allocIndividuo(&populacao[i], n);
+    for(int j = 0; j < n; j++){
+      populacao[i].cromossomo[j] = rand();
+    }
   }
 }
 
@@ -172,6 +161,32 @@ void calcularFitness(individuo *populacao, int **grafo, int n, int popSize){
   }
 }
 
+void copiarElite(individuo *populacao, individuo *nextPopulacao, int eliteSize){
+  for(int i = 0; i < eliteSize; i++){
+    nextPopulacao[i] = populacao[i];
+  }
+}
+
+
+void crossover(individuo *populacao, int n, individuo *nextPopulacao, int popSize, int eliteSize, int mutanteSize, int bias){
+  int parenteElite, parenteAleatorio;
+
+  for(int i = eliteSize; i < popSize - mutanteSize; i++){
+    parenteElite = rand() % (eliteSize);
+    parenteAleatorio = rand() % (popSize);
+
+    allocIndividuo(&nextPopulacao[i], n);
+
+    for(int j = 0; j < n; j++){
+      if((rand() % 100)  < bias){
+        nextPopulacao[i].cromossomo[j] = populacao[parenteElite].cromossomo[j];
+      }else{
+        nextPopulacao[i].cromossomo[j] = populacao[parenteAleatorio].cromossomo[j];
+      }
+    }
+  }
+}
+
 
 void main(){
   srand(time(NULL));
@@ -184,49 +199,54 @@ void main(){
   }
   
   int popSize = 10;
-  
-  /*
-  for(int i = 0; i < n; i++){
-    for(int j = 0; j < n; j++){
-      printf("%d ", grafo[i][j]);
-    }
-    printf("\n");
-  }
-
-  individuo ind = newIndividuo(n);
-
-
-  decoder(grafo, ind, n);
-
-  printSolution(ind.solution, n+1);
-  */
+  int eliteSize = 2;
+  int mutanteSize = 2;
+  int bias = 80;
+  int geracoes = 1000;
 
 
   individuo *populacao = malloc(popSize*sizeof(individuo));
+  individuo *nextPopulacao = malloc(popSize*sizeof(individuo));
   
   printf("Preenchendo populacao\n");
   preencherPopulacao(populacao, n, 0, popSize);
-  printf("Populacao preenchida\n");
   
 
-  calcularFitness(populacao, grafo, n, popSize);
-  printf("Populacao decodificada\n");
+  for(int i = 0; i < geracoes; i++){
+    printf("Calculando Fitness\n");
+    calcularFitness(populacao, grafo, n, popSize);
+    
+    printf("Ordenando Populacao\n");
+    quickSortPopulacao(populacao, 0, popSize-1);
 
+    printf("copiando elite\n");
+    copiarElite(populacao, nextPopulacao, eliteSize);
 
+    printf("gerando mutantes\n");
+    preencherPopulacao(nextPopulacao, n, popSize - mutanteSize, popSize);
 
-  printf("imprimindo Populacao\n");
-  for(int i = 0; i < popSize; i++){
-    printf("%d\n", populacao[i].fitness);
+    printf("crossover\n");
+    crossover(populacao, n, nextPopulacao, popSize, eliteSize, mutanteSize, bias);
+
+    populacao = nextPopulacao;
   }
-  printf("Populacao impressa\n");
 
+
+  printf("Calculando Fitness\n");
+  calcularFitness(populacao, grafo, n, popSize);
+    
+  printf("Ordenando Populacao\n");
   quickSortPopulacao(populacao, 0, popSize-1);
 
+
   printf("imprimindo Populacao\n");
   for(int i = 0; i < popSize; i++){
+    printArray(populacao[i].cromossomo, n);
     printf("%d\n", populacao[i].fitness);
   }
   printf("Populacao impressa\n");
+
+  
 
   free(grafo);
 }
