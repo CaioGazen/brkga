@@ -51,7 +51,7 @@ void printArray(int *vet, int n){
 void printSolution(int *vet, int n){
   printf("Solution :");
   for(int i = 0; i < n; i++){
-    printf("%d ", vet[i]);
+    printf("%d ", vet[i] + 1);
   }
   printf("\n");
 }
@@ -148,7 +148,7 @@ void preencherPopulacao(individuo *populacao, int n, int popIni, int popFim){
 void printPopulation(individuo *populacao, int n, int popSize){
   for(int i = 0; i < popSize; i++){
     printf("Individuo %d\n", i);
-    printArray(populacao[i].cromossomo, n);
+    //printArray(populacao[i].cromossomo, n);
     printSolution(populacao[i].solution, n+1);
     printf("Fitness: %d\n", populacao[i].fitness);
   }
@@ -202,7 +202,7 @@ void main(){
   int eliteSize = 2;
   int mutanteSize = 2;
   int bias = 80;
-  int geracoes = 10;
+  int geracoes = 10000;
 
 
   individuo *populacao = malloc(popSize*sizeof(individuo));
@@ -243,7 +243,7 @@ void main(){
 
   printf("imprimindo Populacao\n");
   for(int i = 0; i < popSize; i++){
-    printArray(populacao[i].cromossomo, n);
+    //printArray(populacao[i].cromossomo, n);
     printf("%d\n", populacao[i].fitness);
   }
   printf("Populacao impressa\n");

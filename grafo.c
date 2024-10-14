@@ -22,6 +22,9 @@ void main(){
     }
   }
 
+
+  printf("%d %d\n", n, (((n*n)-n)/2));
+
   for(int i = 0; i < n; i++){
     for(int j = 0; j < n; j++){
       printf("%d ", grafo[i][j]);
