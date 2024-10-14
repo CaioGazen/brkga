@@ -51,7 +51,7 @@ void printArray(int *vet, int n){
 void printSolution(int *vet, int n){
   printf("Solution :");
   for(int i = 0; i < n; i++){
-    printf("%d ", vet[i] + 1);
+    printf("%d ", vet[i]);
   }
   printf("\n");
 }
@@ -119,7 +119,7 @@ int decoder(int **grafo, individuo* ind, int n){
     idx[i] = i;
   }
   printf("antes do memcpy\n");
-  memcpy(copy, ind->cromossomo, n*sizeof(int));
+  memcpy(copy, ind->cromossomo, ((n)*sizeof(int)));
 
   selectionSort(copy, idx, n);
 
@@ -129,7 +129,7 @@ int decoder(int **grafo, individuo* ind, int n){
     fitness += grafo[idx[i]][idx[i+1]];
   }
 
-  memcpy(ind->solution, idx, ((n)*sizeof(int)));
+  memcpy(ind->solution, idx, ((n+1)*sizeof(int)));
 
   ind->fitness = fitness;
 }
@@ -202,7 +202,7 @@ void main(){
   int eliteSize = 2;
   int mutanteSize = 2;
   int bias = 80;
-  int geracoes = 1000;
+  int geracoes = 10;
 
 
   individuo *populacao = malloc(popSize*sizeof(individuo));
@@ -218,6 +218,8 @@ void main(){
     
     printf("Ordenando Populacao\n");
     quickSortPopulacao(populacao, 0, popSize-1);
+
+    printPopulation(populacao, n, popSize);
 
     printf("copiando elite\n");
     copiarElite(populacao, nextPopulacao, eliteSize);
