@@ -186,6 +186,14 @@ void crossover(individuo *populacao, int n, individuo *nextPopulacao, int popSiz
   }
 }
 
+int avgFitness(individuo *populacao, int popSize){
+  int sum = 0;
+  for(int i = 0; i < popSize; i++){
+    sum += populacao[i].fitness;
+  }
+
+  return sum/popSize;
+}
 
 void main(){
   srand(time(NULL));
@@ -201,8 +209,16 @@ void main(){
   int eliteSize = 2;
   int mutanteSize = 2;
   int bias = 80;
-  int geracoes = 100000;
+  int geracoes = 1000000;
+  int geracao;
+  clock_t inicio, atual;
+  inicio = clock();
+   
 
+  FILE *csv;
+  csv = fopen("resultados.csv", "w");
+
+  fprintf(csv, "geracao;minFitness;maxFitness;avgFitness;time\n");
 
   individuo *populacao = malloc(popSize*sizeof(individuo));
   individuo *nextPopulacao = malloc(popSize*sizeof(individuo));
@@ -211,7 +227,7 @@ void main(){
   preencherPopulacao(populacao, n, 0, popSize);
   
 
-  for(int i = 0; i < geracoes; i++){
+  for(geracao = 0; geracao < geracoes; geracao++){
     //printf("Calculando Fitness\n");
     calcularFitness(populacao, grafo, n, popSize);
     
@@ -219,7 +235,8 @@ void main(){
     quickSortPopulacao(populacao, 0, popSize-1);
 
     //printPopulation(populacao, n, popSize);
-
+    fprintf(csv, "%d;%d;%d;%d;%f\n", geracao, populacao[0].fitness, populacao[popSize-1].fitness, avgFitness(populacao, popSize), (double)(clock()-inicio)/CLOCKS_PER_SEC);
+       
     //printf("copiando elite\n");
     copiarElite(populacao, nextPopulacao, eliteSize);
 
@@ -232,7 +249,6 @@ void main(){
     populacao = nextPopulacao;
   }
 
-
   printf("Calculando Fitness\n");
   calcularFitness(populacao, grafo, n, popSize);
     
@@ -240,6 +256,8 @@ void main(){
   quickSortPopulacao(populacao, 0, popSize-1);
 
 
+
+  fprintf(csv, "%d;%d;%d;%d;%f\n", geracao, populacao[0].fitness, populacao[popSize-1].fitness, avgFitness(populacao, popSize), (double)(clock()-inicio)/CLOCKS_PER_SEC);
 
 
   printPopulation(populacao, n, popSize);
@@ -251,6 +269,6 @@ void main(){
   printf("Populacao impressa\n");
 
   
-
+  fclose(csv);
   free(grafo);
 }
