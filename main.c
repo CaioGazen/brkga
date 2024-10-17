@@ -275,22 +275,22 @@ int main(){
   alocarPopulacao(nextPopulacao, n, 0, popSize);
 
   for(geracao = 0; geracao < geracoes; geracao++){
-    //printf("Calculando Fitness\n");
+    // Calcula o Fitness da populacao
     calcularFitness(populacao, grafo, n, popSize);
     
-    //printf("Ordenando Populacao\n");
+    // Ordena a populacao pelo fitness
     quickSortPopulacao(populacao, 0, popSize-1);
 
-    //printPopulation(populacao, n, popSize);
+    // Salva os resultados da geracao no arquivo csv
     fprintf(csv, "%d;%d;%d;%d;%f\n", geracao, populacao[0].fitness, populacao[popSize-1].fitness, avgFitness(populacao, popSize), (double)(clock()-inicio)/CLOCKS_PER_SEC);
        
-    //printf("copiando elite\n");
+    // Copia a elite para a proxima populacao
     copiarElite(populacao, nextPopulacao, eliteSize, n);
 
-    //printf("gerando mutantes\n");
+    // Preenche uma parte da populacao com mutantes(individuos aleatorios novos)
     preencherPopulacao(nextPopulacao, n, popSize - mutanteSize, popSize);
 
-    //printf("crossover\n");
+    // Faz o crossover dos individuos com a chave aleatoria
     crossover(populacao, n, nextPopulacao, popSize, eliteSize, mutanteSize, bias);
 
     aux = populacao;
