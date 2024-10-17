@@ -283,7 +283,7 @@ int main(){
 
     // Salva os resultados da geracao no arquivo csv
     fprintf(csv, "%d;%d;%d;%d;%f\n", geracao, populacao[0].fitness, populacao[popSize-1].fitness, avgFitness(populacao, popSize), (double)(clock()-inicio)/CLOCKS_PER_SEC);
-       
+
     // Copia a elite para a proxima populacao
     copiarElite(populacao, nextPopulacao, eliteSize, n);
 
@@ -292,7 +292,6 @@ int main(){
 
     // Faz o crossover dos individuos com a chave aleatoria
     crossover(populacao, n, nextPopulacao, popSize, eliteSize, mutanteSize, bias);
-
 
     // troca os ponteiros da população atual e da proxima população
     aux = populacao;
