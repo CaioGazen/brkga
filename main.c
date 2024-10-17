@@ -293,6 +293,7 @@ int main(){
     // Faz o crossover dos individuos com a chave aleatoria
     crossover(populacao, n, nextPopulacao, popSize, eliteSize, mutanteSize, bias);
 
+    // Troca os ponteiros da populacao atual e da proxima populacao
     aux = populacao;
     populacao = nextPopulacao;
     nextPopulacao = aux;
