@@ -17,7 +17,7 @@ void main(){
         grafo[i][j] = 0;
       }
       else{
-        grafo[i][j] = rand() % 10;
+        grafo[i][j] = (rand() % 9) + 1;
       }
     }
   }

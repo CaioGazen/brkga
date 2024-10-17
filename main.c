@@ -7,6 +7,7 @@
 typedef struct {
   int *cromossomo;
   int *solution;
+  int solved;
   int fitness;
 } individuo; 
 
@@ -47,12 +48,40 @@ void printArray(int *vet, int n){
   printf("\n");
 }
 
+int search(int *vet, int n, int key){
+  for(int i = 0; i < n; i++){
+    if(vet[i] == key){
+      return i;
+    }
+  }
+  return -1;
+}
+
+void fprintSolution(FILE *output, int *vet, int n){
+  int first = search(vet, n - 1, 0);
+
+  for(int i = first; i < n - 1; i++){
+    fprintf(output, "%d ", vet[i] + 1);
+  }
+
+  for (int i = 0; i <= first; i++){
+    fprintf(output, "%d ", vet[i] + 1);
+  }
+
+  fprintf(output, "\n");
+}
 
 void printSolution(int *vet, int n){
-  printf("Solution :");
-  for(int i = 0; i < n; i++){
+  int first = search(vet, n - 1, 0);
+
+  for(int i = first; i < n - 1; i++){
     printf("%d ", vet[i] + 1);
   }
+
+  for (int i = 0; i <= first; i++){
+    printf("%d ", vet[i] + 1);
+  }
+
   printf("\n");
 }
 
@@ -75,7 +104,6 @@ void selectionSort(int *vet, int *idx, int n){
     idx[min] = aux;
   }
 }
-
 
 int particiona(individuo *populacao, int ini, int fim){
   int pivo = populacao[ini].fitness;
@@ -112,7 +140,7 @@ void quickSortPopulacao(individuo *populacao,  int ini, int fim){
 }
 
 
-int decoder(int **grafo, individuo* ind, int n){
+void decoder(int **grafo, individuo* ind, int n){
   int idx[n+1], copy[n];
   int fitness = 0;
   for(int i = 0; i < n; i++){
@@ -134,9 +162,14 @@ int decoder(int **grafo, individuo* ind, int n){
 }
 
 
-void preencherPopulacao(individuo *populacao, int n, int popIni, int popFim){
+void alocarPopulacao(individuo *populacao, int n,int popIni, int popFim){
   for(int i = popIni; i < popFim; i++){
     allocIndividuo(&populacao[i], n);
+  }
+}
+
+void preencherPopulacao(individuo *populacao, int n, int popIni, int popFim){
+  for(int i = popIni; i < popFim; i++){
     for(int j = 0; j < n; j++){
       populacao[i].cromossomo[j] = rand();
     }
@@ -146,7 +179,7 @@ void preencherPopulacao(individuo *populacao, int n, int popIni, int popFim){
 
 void printPopulation(individuo *populacao, int n, int popSize){
   for(int i = 0; i < popSize; i++){
-    printf("Individuo %d\n", i);
+    printf("\nIndividuo %d\n", i);
     //printArray(populacao[i].cromossomo, n);
     printSolution(populacao[i].solution, n+1);
     printf("Fitness: %d\n", populacao[i].fitness);
@@ -160,9 +193,11 @@ void calcularFitness(individuo *populacao, int **grafo, int n, int popSize){
   }
 }
 
-void copiarElite(individuo *populacao, individuo *nextPopulacao, int eliteSize){
+void copiarElite(individuo *populacao, individuo *nextPopulacao, int eliteSize, int n){
   for(int i = 0; i < eliteSize; i++){
-    nextPopulacao[i] = populacao[i];
+    for(int j = 0; j < n; j++){
+      nextPopulacao[i].cromossomo[j] = populacao[i].cromossomo[j];
+    }
   }
 }
 
@@ -174,7 +209,6 @@ void crossover(individuo *populacao, int n, individuo *nextPopulacao, int popSiz
     parenteElite = rand() % (eliteSize);
     parenteAleatorio = rand() % (popSize);
 
-    allocIndividuo(&nextPopulacao[i], n);
 
     for(int j = 0; j < n; j++){
       if((rand() % 100)  < bias){
@@ -186,52 +220,83 @@ void crossover(individuo *populacao, int n, individuo *nextPopulacao, int popSiz
   }
 }
 
+int avgFitness(individuo *populacao, int popSize){
+  int sum = 0;
+  for(int i = 0; i < popSize; i++){
+    sum += populacao[i].fitness;
+  }
 
-void main(){
-  srand(time(NULL));
+  return sum/popSize;
+}
+
+int main(){
+  //srand(time(NULL));
+  srand(0);
   int n, m;
   int **grafo;
   grafo = lergrafo("grafo.txt", &n, &m);
   if(grafo == NULL){
     printf("Erro ao ler o grafo\n");
-    return;
+    return 0;
   }
   
-  int popSize = 10;
-  int eliteSize = 2;
-  int mutanteSize = 2;
-  int bias = 80;
-  int geracoes = 100000;
+  int popSize = 100;
+  float eliteSize = 0.2;
+  float mutanteSize = 0.2;
+  float bias = 0.8;
+  int geracoes = 1000;
+  int geracao;
+  clock_t inicio;
+  inicio = clock();
 
+  eliteSize = popSize * eliteSize;
+  mutanteSize = popSize * mutanteSize;
+  bias = bias * 100;
 
+  printf("eliteSize: %f\n", eliteSize);
+  printf("mutanteSize: %f\n", mutanteSize);
+  printf("bias: %f\n", bias);
+
+  FILE *csv;
+  csv = fopen("resultados.csv", "w");
+
+  fprintf(csv, "geracao;minFitness;maxFitness;avgFitness;time\n");
+
+  individuo *aux;
   individuo *populacao = malloc(popSize*sizeof(individuo));
   individuo *nextPopulacao = malloc(popSize*sizeof(individuo));
   
+  // Aloca e Preenche a populacao inicial
   printf("Preenchendo populacao inicial\n");
+  alocarPopulacao(populacao, n, 0, popSize);
   preencherPopulacao(populacao, n, 0, popSize);
-  
 
-  for(int i = 0; i < geracoes; i++){
-    //printf("Calculando Fitness\n");
+  // Aloca a proxima populacao
+  alocarPopulacao(nextPopulacao, n, 0, popSize);
+
+  for(geracao = 0; geracao < geracoes; geracao++){
+    // Calcula o Fitness da populacao
     calcularFitness(populacao, grafo, n, popSize);
     
-    //printf("Ordenando Populacao\n");
+    // Ordena a populacao pelo fitness
     quickSortPopulacao(populacao, 0, popSize-1);
 
-    //printPopulation(populacao, n, popSize);
+    // Salva os resultados da geracao no arquivo csv
+    fprintf(csv, "%d;%d;%d;%d;%f\n", geracao, populacao[0].fitness, populacao[popSize-1].fitness, avgFitness(populacao, popSize), (double)(clock()-inicio)/CLOCKS_PER_SEC);
+       
+    // Copia a elite para a proxima populacao
+    copiarElite(populacao, nextPopulacao, eliteSize, n);
 
-    //printf("copiando elite\n");
-    copiarElite(populacao, nextPopulacao, eliteSize);
-
-    //printf("gerando mutantes\n");
+    // Preenche uma parte da populacao com mutantes(individuos aleatorios novos)
     preencherPopulacao(nextPopulacao, n, popSize - mutanteSize, popSize);
 
-    //printf("crossover\n");
+    // Faz o crossover dos individuos com a chave aleatoria
     crossover(populacao, n, nextPopulacao, popSize, eliteSize, mutanteSize, bias);
 
+    aux = populacao;
     populacao = nextPopulacao;
+    nextPopulacao = aux;
   }
-
 
   printf("Calculando Fitness\n");
   calcularFitness(populacao, grafo, n, popSize);
@@ -241,16 +306,43 @@ void main(){
 
 
 
+  fprintf(csv, "%d;%d;%d;%d;%f\n", geracao, populacao[0].fitness, populacao[popSize-1].fitness, avgFitness(populacao, popSize), (double)(clock()-inicio)/CLOCKS_PER_SEC);
+
 
   printPopulation(populacao, n, popSize);
-  printf("imprimindo Populacao\n");
+  
+  printf("imprimindo Fitness\n");
   for(int i = 0; i < popSize; i++){
     //printArray(populacao[i].cromossomo, n);
     printf("%d\n", populacao[i].fitness);
   }
-  printf("Populacao impressa\n");
 
-  
+  printf("Tempo de execução: %f\n", (double)(clock()-inicio)/CLOCKS_PER_SEC);
 
+  printf("Melhor solução: \n");
+  printf("%d\n", populacao[0].fitness);
+  printSolution(populacao[0].solution, n + 1);
+
+  FILE *output;
+  output = fopen("melhorSolucao.txt", "w");
+
+  fprintf(output, "%d\n", populacao[0].fitness);
+  fprintSolution(output, populacao[0].solution, n + 1);
+
+
+
+  for(int i = 0; i < popSize; i++){
+    free(populacao[i].cromossomo);
+    free(populacao[i].solution);
+    free(nextPopulacao[i].cromossomo);
+    free(nextPopulacao[i].solution);
+  }
+
+  free(populacao);
+  free(nextPopulacao);
+
+  fclose(csv);
   free(grafo);
+
+  return 1;
 }
