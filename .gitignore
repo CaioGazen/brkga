@@ -3,3 +3,4 @@ teste/
 *.out
 *.csv
 *.txt
+!grafo.txt
