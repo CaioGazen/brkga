@@ -73,7 +73,7 @@ int calcularFitness(int **grafo, int *solucao, int n){
 int verificarDuplicados(int *solucao, int n){
   for(int i = 0; i < n; i++){
     for(int j = 0; j < n; j++){
-      if(solucao[i] == solucao[j]){
+      if(solucao[i] == solucao[j] && i != j){
         return 1;
       }
     }
@@ -102,16 +102,29 @@ int main(){
   }
 
   if(solucao[0] != 1 || solucao[n] != 1){
-    printf("Solução inválida não começa ou não termina no primeiro nó\n");
+    printf("Solução inválida, não começa ou não termina no primeiro nó\n");
     return -1;
   }
 
+  if(verificarDuplicados(solucao, n)){
+    printf("Solução inválida, contém vértices duplicados\n");
+    return -1;
+  }
   
 
   fitnessCalculada = calcularFitness(grafo, solucao, n);
 
+  if (fitnessCalculada == -1){
+    return -1;
+  }
+
   printf("Fitness Calculada: %d\n", fitnessCalculada);
   printf("Fitness Solução: %d\n", fitnessSolucao);
 
+  if(fitnessCalculada != fitnessSolucao){
+    printf("Solução inválida, fitness calculada diferente do fitness da solução\n");
+    return -1;
+  }
+  
   return 0;
 }
