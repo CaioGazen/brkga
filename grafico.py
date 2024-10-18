@@ -5,10 +5,13 @@ csv = pd.read_csv("resultados.csv", sep=";")
 
 print(csv)
 
-x = csv["time"]
+x = csv["geracao"]
 y = csv["minFitness"]
-y2 = csv["maxFitness"]
+y2 = csv["avgFitness"]
 
-plt.plot(x, y)
+plt.ylabel("Fitness")
+plt.xlabel("geracao")
+
+plt.plot(x, y, y2)
 
 plt.show()
