@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <sys/syscall.h>
 #include <string.h>
 
 typedef struct {
