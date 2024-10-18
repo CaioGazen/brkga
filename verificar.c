@@ -70,6 +70,7 @@ int calcularFitness(int **grafo, int *solucao, int n){
   return fitness;
 }
 
+
 int verificarDuplicados(int *solucao, int n){
   for(int i = 0; i < n; i++){
     for(int j = 0; j < n; j++){
@@ -91,7 +92,7 @@ int main(){
   if(grafo == NULL){
     printf("Erro ao ler o grafo\n");
     return -1;
-      
+
   }
 
   solucao = lerSolucao("melhorSolucao.txt", &fitnessSolucao, n + 1);
@@ -125,6 +126,6 @@ int main(){
     printf("Solução inválida, fitness calculada diferente do fitness da solução\n");
     return -1;
   }
-  
+
   return 0;
 }
