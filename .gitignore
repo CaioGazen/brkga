@@ -1,5 +1,5 @@
 teste/
 .vscode
-.out
-.csv
-.txt
+*.out
+*.csv
+*.txt
