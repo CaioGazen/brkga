@@ -253,8 +253,8 @@ int avgFitness(individuo *populacao, int popSize){
 }
 
 int main(){
-  //srand(time(NULL));
-  srand(0);
+  srand(time(NULL));
+  //srand(0);
   int n, m;
   int **grafo;
   grafo = lergrafo("grafo.txt", &n, &m);
