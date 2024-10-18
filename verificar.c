@@ -127,5 +127,7 @@ int main(){
     return -1;
   }
 
+  printf("\nSolução válida\n");
+
   return 0;
 }
