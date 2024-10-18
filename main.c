@@ -86,22 +86,45 @@ void printSolution(int *vet, int n){
 }
 
 
-void selectionSort(int *vet, int *idx, int n){
-  int aux, min;
-  for(int i = 0; i < n; i++){
-    min = i;
-    for(int j = i+1; j < n; j++){
-      if(vet[j] < vet[min]){
-        min = j;
-      }
+int particionaDecoder(int *vet, int *idx, int ini, int fim){
+  int pivo = vet[ini];
+  int i = ini;
+  int aux;
+
+  for(int j = ini+1; j <= fim; j++){
+    if(vet[j] <= pivo){
+
+      i++;
+
+      aux = vet[i];
+      vet[i] = vet[j];
+      vet[j] = aux;
+
+      aux = idx[i];
+      idx[i] = idx[j];
+      idx[j] = aux;
     }
-    aux = vet[i];
-    vet[i] = vet[min];
-    vet[min] = aux;
-    
-    aux = idx[i];
-    idx[i] = idx[min];
-    idx[min] = aux;
+  }
+
+  aux = vet[i];
+  vet[i] = vet[ini];
+  vet[ini] = aux;
+
+  aux = idx[i];
+  idx[i] = idx[ini];
+  idx[ini] = aux;
+
+  return i;
+}
+
+
+void quickSortDecoder(int *vet, int *idx,  int ini, int fim){
+  int meio;
+
+  if (ini < fim){
+    meio = particionaDecoder(vet, idx, ini, fim);
+    quickSortDecoder(vet, idx, ini, meio-1);
+    quickSortDecoder(vet, idx, meio+1, fim);
   }
 }
 
@@ -148,7 +171,7 @@ void decoder(int **grafo, individuo* ind, int n){
   }
   memcpy(copy, ind->cromossomo, ((n)*sizeof(int)));
 
-  selectionSort(copy, idx, n);
+  quickSortDecoder(copy, idx, 0, n - 1);
 
   idx[n] = idx[0];
 
@@ -244,7 +267,7 @@ int main(){
   float eliteSize = 0.2;
   float mutanteSize = 0.2;
   float bias = 0.8;
-  int geracoes = 1000;
+  int geracoes = 100000;
   int geracao;
   clock_t inicio;
   inicio = clock();
