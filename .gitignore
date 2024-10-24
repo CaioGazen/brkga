@@ -4,3 +4,4 @@ teste/
 *.csv
 *.txt
 !grafo.txt
+!melhorSolucao500.txt
